@@ -1,28 +1,43 @@
 # Databricks notebook source
-# MAGIC %pip install --upgrade databricks-sdk
+# MAGIC %pip install --upgrade databricks-sdk datasets
 # MAGIC dbutils.library.restartPython()
 
 # COMMAND ----------
 
-from datasets import load_dataset
-
-audio_ds = load_dataset("Nexdata/accented_english", split="train")
+# MAGIC %sql
+# MAGIC USE CATALOG forrest_murray;
+# MAGIC USE SCHEMA speech;
 
 # COMMAND ----------
 
-from datasets import load_dataset
-import pandas as pd
+audio_ds = spark.table('fleurs_en')
+
+# COMMAND ----------
+
+sample = audio_ds.first()
+
+# COMMAND ----------
+
+from IPython.display import Audio
+import io
+
+audio_bytes = sample["audio"]["bytes"]
+audio_io = io.BytesIO(audio_bytes)
+audio = Audio(audio_io.read())
+
+display(audio)
+
+# COMMAND ----------
+
+sample["transcription"]
+
+# COMMAND ----------
+
 import base64
-import json
 
 from databricks.sdk import WorkspaceClient
 
-sample_path = dataset[0]["audio"]["path"]
-
-with open(sample_path, 'rb') as audio_file:
-    audio_bytes = audio_file.read()
-    audio_b64 = base64.b64encode(audio_bytes).decode('ascii')
-
+audio_b64 = base64.b64encode(audio_bytes).decode('ascii')
 dataframe_records = [audio_b64]
 
 w = WorkspaceClient()
