@@ -62,6 +62,10 @@ category_counts
 
 # COMMAND ----------
 
+raw_pdf_elements
+
+# COMMAND ----------
+
 class Element(BaseModel):
     type: str
     text: Any
